@@ -1,12 +1,10 @@
 package Tests;
 
-import java.util.List;
-
+import QuantumUtils.MatrixUtils;
 import QuantumUtils.Point;
 import QuantumUtils.Qpoz;
 import QuantumUtils.Utils;
-import QuantumUtils.UtilsMatrix;
-import QuantumUtils.UtilsPrint;
+import QuantumUtils.PrintUtils;
 import QuantumUtils.WalkerUtils;
 
 public class TestStep_final {
@@ -32,19 +30,19 @@ public class TestStep_final {
 	public static void main(String[] args) {
 		float teta0 = (float)bestChr[0];
 		float teta1 = (float)bestChr[1];
-		float[][] A = UtilsMatrix.getA(teta0, teta1);
+		float[][] A = MatrixUtils.getA(teta0, teta1);
 		float[][] coin = TestData.gammaForCoinFromPaper;
-		float[][] gamma = UtilsMatrix.multiply(A, coin);
+		float[][] gamma = MatrixUtils.multiply(A, coin);
 		
 		System.out.println("initial qbits:");
 		System.out.println(getQbitsFromTetas(bestChr));
-		System.out.println("GAMMA0 = A(teta1,teta2) * coin_matrix : \n"+UtilsPrint.toString(gamma));
+		System.out.println("GAMMA0 = A(teta1,teta2) * coin_matrix : \n"+PrintUtils.toString(gamma));
 		
 		float teta2 = (float)bestChr[2];
 		float teta3 = (float)bestChr[3];
-		A = UtilsMatrix.getA(teta2, teta3);
-		float[][] U = UtilsMatrix.multiply(A, coin);
-		System.out.println("U = A(teta3,teta4) * coin_matrix : \n"+UtilsPrint.toString(U));
+		A = MatrixUtils.getA(teta2, teta3);
+		float[][] U = MatrixUtils.multiply(A, coin);
+		System.out.println("U = A(teta3,teta4) * coin_matrix : \n"+PrintUtils.toString(U));
 		
 		Point startPoint = TestData.startPoints.get(0);
 		int startOrientation = TestData.startOrientations[0];
@@ -54,14 +52,14 @@ public class TestStep_final {
 		//System.out.println(UtilsPrint.toString(WalkerUtils.getProbForAllPositions(p)));
 		
 		for (int step=0;step<TestData.timeHorizon;step++) {
-			gamma = UtilsMatrix.multiply(U, gamma);
+			gamma = MatrixUtils.multiply(U, gamma);
 			//System.out.println("\nstep "+ step);
 			Utils.step(p, gamma, false);
 			//System.out.println("psi (neutral,target,trap, &), step "+step+": " + UtilsPrint.getPsiFormatted(p));
 			//System.out.println(UtilsPrint.toString(WalkerUtils.getProbForAllPositions(p)));
 			float[][] prob = WalkerUtils.getProbForAllPositions(p);
 			System.out.println("step "+step+", " + getMaxProbString(prob) + 
-					", all probabilities:\n" + UtilsPrint.toString(prob));
+					", all probabilities:\n" + PrintUtils.toString(prob));
 			
 		}
 	}

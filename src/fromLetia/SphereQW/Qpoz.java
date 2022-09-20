@@ -1,4 +1,4 @@
-package SphereQuantumWalker_Letia;
+package fromLetia.SphereQW;
 //stores X and Y position by two Qvec vector of dm dimension
 public class Qpoz {
 	Qvec X, Y, tempQ1, tempQ2, tempQ3, tempQ4;

@@ -5,6 +5,7 @@ import java.util.List;
 
 import QuantumUtils.Point;
 
+// test data for QPN
 public class TestData {
 	public static float ro = (float) (1/Math.sqrt(2.0));
 	public static float[] oneQbitRo = new float[] { ro, ro, 0, 0 }; // c0re,c0im,c1re,c1im

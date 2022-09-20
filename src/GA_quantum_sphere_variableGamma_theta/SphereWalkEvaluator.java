@@ -1,20 +1,15 @@
 package GA_quantum_sphere_variableGamma_theta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
-import org.jgap.impl.IntegerGene;
 
-import GAUtils.UtilsGA;
 import QuantumUtils.Point;
 import QuantumUtils.Qpoz;
 import QuantumUtils.Utils;
-import QuantumUtils.UtilsMatrix;
-import QuantumUtils.UtilsPrint;
+import QuantumUtils.MatrixUtils;
 import QuantumUtils.WalkerUtils;
 import Tests.TestData;
 
@@ -32,7 +27,7 @@ public class SphereWalkEvaluator extends FitnessFunction {
 			for (int orientation: TestData.startOrientations){
 				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
 				for (int step=0;step<TestData.timeHorizon;step++) {
-					gamma = UtilsMatrix.multiply(U, gamma);
+					gamma = MatrixUtils.multiply(U, gamma);
 					Utils.step(p, gamma, false);
 					
 					double trapProbability = WalkerUtils.getProbForPositionsTotal(p, TestData.trapPoints);
@@ -50,31 +45,18 @@ public class SphereWalkEvaluator extends FitnessFunction {
 		//System.out.println(fitness + POSITIVE_BIAS);
 		return fitness + POSITIVE_BIAS;
 	}
-	private static String getMaxProbString(float[][] prob) {
-		int imax=0,jmax = 0;
-		float probmax = prob[0][0];
-		for (int i=0;i<8;i++)
-			for (int j=0;j<8;j++)
-				if (prob[i][j] > probmax) {
-					probmax = prob[i][j];
-					imax = i;
-					jmax = j;
-				}
-		return "maxProbability: "+probmax+" at position: ("+imax+","+jmax+")";
-	}
 	
 	public String getPsiString(IChromosome chr) {
 		float psi_p_min = 1, psi_p_max = 0;
 		float psi_g_min = 1, psi_g_max = 0;
 		float psi_n_min = 1, psi_n_max = 0;
-		int maxStep = TestData.timeHorizon;
 		float[][] gamma = MappingGamma0(chr); // this is gamma0 at this point
 		float[][] U = MappingU(chr); 
 		for (Point startPoint: TestData.startPoints)
 			for (int orientation: TestData.startOrientations){
 				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
 				for (int step=0;step<TestData.timeHorizon;step++) {
-					gamma = UtilsMatrix.multiply(U, gamma);
+					gamma = MatrixUtils.multiply(U, gamma);
 					Utils.step(p, gamma, false);
 
 					float psi_p = WalkerUtils.psi_p(p);
@@ -88,37 +70,21 @@ public class SphereWalkEvaluator extends FitnessFunction {
 					psi_n_max = Math.max(psi_n_max, psi_n);
 					
 					if (WalkerUtils.psi_g(p) > thresholdProbabilityTarget) {
-						maxStep = step;
 						break;
 					}
 				}
 			}
-		/*return String.format("[%.2f-%.2f][%.2f-%.2f][%.2f-%.2f] maxstep "+maxStep,
-				psi_n_min, psi_n_max,
-				psi_g_min, psi_g_max,
-				psi_p_min, psi_p_max);
-				*/
 		return String.format("%.6f\t%.6f",psi_g_max,psi_p_max);
 	}
-	
-	/*private double getPointsProbability(Qpoz[] p, List<Point> points) {
-		float probability = 0;
-		for (Point point: points) {
-			for (int orient=0;orient<4;orient++)
-				probability += p[orient].getProbabilityForPosition(point.x, point.y);
-		} 	
-		return probability;
-	}
-	*/
 
 	public float[][] MappingGamma0(IChromosome chr){
 		// returneaza gamma, cromozomul are 2 nr float [0, 2*pi]
 		float teta0 = (float)((DoubleGene)chr.getGene(0)).doubleValue();
 		float teta1 = (float)((DoubleGene)chr.getGene(1)).doubleValue();
-		float[][] A = UtilsMatrix.getA(teta0, teta1);
+		float[][] A = MatrixUtils.getA(teta0, teta1);
 		float[][] coin = TestData.gammaForCoinFromPaper;
 
-		float[][] result = UtilsMatrix.multiply(A, coin);
+		float[][] result = MatrixUtils.multiply(A, coin);
 		//System.out.println("A\n"+UtilsPrint.toStringOneLine(result));
 		return result;
 	}
@@ -127,10 +93,10 @@ public class SphereWalkEvaluator extends FitnessFunction {
 		// returneaza gamma, cromozomul are 2 nr float [0, 2*pi]
 		float teta2 = (float)((DoubleGene)chr.getGene(2)).doubleValue();
 		float teta3 = (float)((DoubleGene)chr.getGene(3)).doubleValue();
-		float[][] A = UtilsMatrix.getA(teta2, teta3);
+		float[][] A = MatrixUtils.getA(teta2, teta3);
 		float[][] coin = TestData.gammaForCoinFromPaper;
 
-		float[][] result = UtilsMatrix.multiply(A, coin);
+		float[][] result = MatrixUtils.multiply(A, coin);
 		//System.out.println("U\n"+UtilsPrint.toStringOneLine(result));
 		return result;
 	}
@@ -171,7 +137,7 @@ public class SphereWalkEvaluator extends FitnessFunction {
 			for (int orientation: TestData.startOrientations){
 				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
 				for (int step=0;step<TestData.timeHorizon;step++) {
-					gamma = UtilsMatrix.multiply(U, gamma);
+					gamma = MatrixUtils.multiply(U, gamma);
 					Utils.step(p, gamma, false);
 					double prob = WalkerUtils.getProbForPositionsTotal(p, points);
 					maxProbability = Math.max(maxProbability, prob);
@@ -190,7 +156,7 @@ public class SphereWalkEvaluator extends FitnessFunction {
 			for (int orientation: TestData.startOrientations){
 				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
 				for (int step=0;step<TestData.timeHorizon;step++) {
-					gamma = UtilsMatrix.multiply(U, gamma);
+					gamma = MatrixUtils.multiply(U, gamma);
 					Utils.step(p, gamma, false);
 					double targetProbability = WalkerUtils.getProbForPositionsTotal(p, TestData.targetPoints);
 					if (maxProbability < targetProbability)

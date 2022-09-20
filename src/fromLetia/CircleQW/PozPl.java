@@ -1,4 +1,4 @@
-package CircleQW;
+package fromLetia.CircleQW;
 
 //place instantiation
 public class PozPl {

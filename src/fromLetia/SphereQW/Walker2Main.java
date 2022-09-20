@@ -1,4 +1,4 @@
-package SphereQuantumWalker_Letia;
+package fromLetia.SphereQW;
 
 public class Walker2Main {
 

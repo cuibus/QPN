@@ -1,14 +1,9 @@
 package GAUtils;
 
-import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
-import org.jgap.Population;
-import org.jgap.impl.DoubleGene;
-
-import QuantumUtils.Utils;
 
 public class PopulationInitializatorConstantGamma {
 	// initializes the population with chromosomes filled with constant values

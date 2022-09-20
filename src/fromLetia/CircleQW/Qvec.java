@@ -1,4 +1,4 @@
-package CircleQW;
+package fromLetia.CircleQW;
 
 //Quantum Vector
 //dm - dimension

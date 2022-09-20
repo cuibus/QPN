@@ -1,6 +1,6 @@
 package QuantumUtils;
 
-public class UtilsQbit {
+public class QbitUtils {
 	public static float[] multiplyA(float[] qbit, float theta) {
 		// qbit trebuie sa aiba 1qbit, adica 4 elemente: c0re,c0im,c1re,c1im
 		double[][] A = new double[][] {

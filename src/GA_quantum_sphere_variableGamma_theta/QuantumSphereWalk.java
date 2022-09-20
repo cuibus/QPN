@@ -10,9 +10,9 @@ import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.DoubleGene;
 
 import GAUtils.RandomUnitaryTransformOperator;
-import GAUtils.UtilsGA;
-import GAUtils.QuantumInspiredGAForFloats.FloatProgressiveTransformOperator;
-import QuantumUtils.UtilsPrint;
+import GAUtils.FloatProgressiveTransformOperator;
+import GAUtils.GAUtils;
+import QuantumUtils.PrintUtils;
 
 public class QuantumSphereWalk {
 	// initial: rCoin = randomCoinFromPaper
@@ -58,7 +58,7 @@ public class QuantumSphereWalk {
 		conf.setSampleChromosome(sampleChromosome);
 		conf.setPopulationSize(1);
 		Genotype population = Genotype.randomInitialGenotype(conf);
-		UtilsGA.addChrToPopulation(population, bestChrsSoFar);
+		GAUtils.addChrToPopulation(population, bestChrsSoFar);
 		for (int i = 0; i < MAX_ALLOWED_EVOLUTIONS; i++) {
 			//population.evolve();
 			IChromosome bestChrSoFar = population.getFittestChromosome();
@@ -75,7 +75,7 @@ public class QuantumSphereWalk {
 			*///System.out.println("Trajectory: " + trajectory);
 			String psiString = ff.getPsiString(bestChrSoFar);
 			System.out.println(i+". " + bestChrSoFar.getFitnessValue() 
-			+ "\t" + UtilsPrint.toString(bestChrSoFar)
+			+ "\t" + PrintUtils.toString(bestChrSoFar)
 			//+ "" + ff.getTargetMaxProbability(bestChrSoFar)
 			//+ "\t " + ff.getTrapMaxProbability(bestChrSoFar));
 			+ "" + psiString);

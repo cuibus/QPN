@@ -5,8 +5,7 @@ import java.util.List;
 import QuantumUtils.Point;
 import QuantumUtils.Qpoz;
 import QuantumUtils.Utils;
-import QuantumUtils.UtilsMatrix;
-import QuantumUtils.UtilsPrint;
+import QuantumUtils.PrintUtils;
 import QuantumUtils.WalkerUtils;
 
 public class TestStep_left {
@@ -19,8 +18,8 @@ public class TestStep_left {
 		int startOrientation = TestData.startOrientations[0];
 		Qpoz[] p = Utils.getQpozInitial(startOrientation, startPoint.x, startPoint.y);
 		
-		System.out.println("psi step000: " + UtilsPrint.getPsiFormatted(p));
-		System.out.println(UtilsPrint.toString(WalkerUtils.getProbForAllPositions(p)));
+		System.out.println("psi step000: " + PrintUtils.getPsiFormatted(p));
+		System.out.println(PrintUtils.toString(WalkerUtils.getProbForAllPositions(p)));
 		
 		for (int step=0;step<TestData.timeHorizon;step++) {
 			System.out.println("\nstep "+ step);
@@ -30,8 +29,8 @@ public class TestStep_left {
 			System.out.println(
 					"target prob: " + String.format("%.4f", targetProbability) + ", " +
 							"trap prob: " + String.format("%.4f", trapProbability));
-			System.out.println("psi step "+step+": " + UtilsPrint.getPsiFormatted(p));
-			System.out.println(UtilsPrint.toString(WalkerUtils.getProbForAllPositions(p)));
+			System.out.println("psi step "+step+": " + PrintUtils.getPsiFormatted(p));
+			System.out.println(PrintUtils.toString(WalkerUtils.getProbForAllPositions(p)));
 		}
 	}
 	

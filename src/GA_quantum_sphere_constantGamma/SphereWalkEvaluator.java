@@ -9,11 +9,11 @@ import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
 
-import GAUtils.UtilsGA;
+import GAUtils.GAUtils;
 import QuantumUtils.Point;
 import QuantumUtils.Qpoz;
 import QuantumUtils.Utils;
-import QuantumUtils.UtilsPrint;
+import QuantumUtils.PrintUtils;
 import Tests.TestData;
 
 public class SphereWalkEvaluator extends FitnessFunction {
@@ -23,16 +23,16 @@ public class SphereWalkEvaluator extends FitnessFunction {
 
 	public double evaluate(IChromosome chr) {
 		float[][] constantGamma = Mapping1(chr);
-		UtilsPrint.printChr(chr);
-		System.out.println("constantGamma: \n " + UtilsPrint.toString(constantGamma));
+		PrintUtils.printChr(chr);
+		System.out.println("constantGamma: \n " + PrintUtils.toString(constantGamma));
 		double fitness = 0;
 		for (Point startPoint: TestData.startPoints)
 			for (int orientation: TestData.startOrientations){
 				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
 				for (int step=0;step<TestData.timeHorizon;step++) {
 					Utils.step(p, constantGamma, false);
-					fitness += UtilsGA.getTrapPenalization(p, thresholdProbabilityTrap);
-					double bonification = UtilsGA.getTargetBonification(p, thresholdProbabilityTarget);
+					fitness += GAUtils.getTrapPenalization(p, thresholdProbabilityTrap);
+					double bonification = GAUtils.getTargetBonification(p, thresholdProbabilityTarget);
 					if (bonification > 0) {
 						fitness -= bonification;
 						break; // stop simulation
@@ -55,6 +55,6 @@ public class SphereWalkEvaluator extends FitnessFunction {
 	
 	public String asStringOneLine(IChromosome chr) {
 		float[][] gamma = Mapping1(chr);
-		return UtilsPrint.toStringOneLine(gamma);
+		return PrintUtils.toStringOneLine(gamma);
 	}
 }

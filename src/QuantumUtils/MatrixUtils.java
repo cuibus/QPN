@@ -2,18 +2,19 @@ package QuantumUtils;
 
 import Tests.TestData;
 
-public class UtilsMatrix {
+public class MatrixUtils {
+
 	// adds several matrices
 	public static float[][] add(float[][] ... mat ){
 		int nrMatrices = mat.length;
-		float[][] res = new float[mat[0].length][mat[0][0].length];
+		float[][] result = new float[mat[0].length][mat[0][0].length];
 		for (int i=0;i<mat[0].length;i++)
 			for (int j=0;j<mat[0][0].length;j++) 
 				for (int m=0;m<nrMatrices;m++)
-					res[i][j] += mat[m][i][j];
-		return res;	
+					result[i][j] += mat[m][i][j];
+		return result;	
 	}
-	
+
 	//multiplies two matrices
 	public static float[][] multiply(float[][] mat1, float[][] mat2){
 		float[][] res = new float[mat1.length][mat2[0].length];
@@ -42,20 +43,8 @@ public class UtilsMatrix {
 		return res;	
 	}
 
-	public static float[] shift(float[] vec) {
-		float[] res = new float[vec.length];
-		for (int i=0;i<vec.length-1;i++)
-			res[i+1] = vec[i];
-		res[0] = vec[vec.length-1];
-		return res;
-	}
-	
-	public static float sum(float[] vec) {
-		float res = 0;
-		for (int i=0;i<vec.length;i++)
-			res += vec[i];
-		return res;
-	}
+	private static float cos(float theta) { return (float)Math.cos(theta);}
+	private static float sin(float theta) { return (float)Math.sin(theta);}
 
 	//gets the matrix 2x2 denoted by A(theta)
 	public static float[][] getA(float theta){
@@ -64,7 +53,7 @@ public class UtilsMatrix {
 			{sin(theta), cos(theta)}
 		};
 	}
-	
+
 	//gets the matrix 4x4 denoted by A(theta0,theta1)
 	public static float[][] getA(float theta0, float theta1){
 		return new float[][] {
@@ -73,28 +62,6 @@ public class UtilsMatrix {
 			{0, 0, cos(theta1), -sin(theta1)},
 			{0, 0, sin(theta1), cos(theta1)},
 		};
-	}
-
-	public static float[][] getKronekerProduct(float[][] A, float[][] B){
-		float[][] res = new float[A.length*B.length][A[0].length*B[0].length];
-		for (int i=0;i<A.length;i++)
-			for (int j=0;j<A[0].length;j++)
-				for (int m=0;m<B.length;m++)
-					for (int n=0;n<B[0].length;n++)
-						res[i*B.length+m][j*B[0].length+n] = A[i][j]*B[m][n];
-		return res;
-	}
-
-	public static void main(String[] args) {
-		float[][] A = new float[][] {
-			{1, 2, 5},
-			{3, 4, 6}
-		};
-		float[][] B = new float[][] {
-			{0, 5},
-			{6, 7},
-		};
-		System.out.println(UtilsPrint.toString(getKronekerProduct(A, B)));
 	}
 
 	//gets the matrix 4x4 denoted by A(theta0..3) in the paper (HCQGA), multiplied by psi_n,psi_g,psi_p,psi_gp (could be obtained by a kroneker product)
@@ -108,13 +75,35 @@ public class UtilsMatrix {
 			{psi_p*cos(theta2), -psi_p*sin(theta2), psi_gp*cos(theta3), -psi_gp*sin(theta3)},
 			{psi_p*sin(theta2), psi_p*cos(theta2),  psi_gp*sin(theta3), psi_gp*cos(theta3)},
 		};
-	}		
-
-	private static float cos(float theta) { return (float)Math.cos(theta);}
-	private static float sin(float theta) { return (float)Math.sin(theta);}
+	}	
 	
- 
-    private static void getCofactor(float mat[][], float temp[][],int p, int q, int n){
+	public static float[][] getAForFitness(float psi_g, float psi_p){
+    	double theta = Math.asin(psi_g - psi_p);
+    	float a0 = TestData.ro * (float)(Math.cos(theta) - Math.sin(theta));
+    	float a1 = TestData.ro * (float)(Math.cos(theta) + Math.sin(theta));
+    	float[][] A = new float[][] {
+    		{a0,  a1},
+    		{a1, -a0},
+    	};
+    	return A;
+    }
+
+	public static float[][] getKronekerProduct(float[][] A, float[][] B){
+		float[][] res = new float[A.length*B.length][A[0].length*B[0].length];
+		for (int i=0;i<A.length;i++)
+			for (int j=0;j<A[0].length;j++)
+				for (int m=0;m<B.length;m++)
+					for (int n=0;n<B[0].length;n++)
+						res[i*B.length+m][j*B[0].length+n] = A[i][j]*B[m][n];
+		return res;
+	}
+
+	public static float getDeterminant(float mat[][]) {
+		if (mat.length!= mat[0].length) throw new RuntimeException("Cannot compute determinant for " + mat.length +"x" + mat[0].length + " matrix");
+		return getDeterminant(mat, mat.length);
+	}
+	
+	private static void getCofactor(float mat[][], float temp[][],int p, int q, int n){
         int i = 0, j = 0;
         for (int row = 0; row < n; row++) {
             for (int col = 0; col < n; col++) {
@@ -126,43 +115,31 @@ public class UtilsMatrix {
         }
     }
  
-    public static float determinantOfMatrix(float mat[][], int n){
-        float D = 0f;
+    private static float getDeterminant(float mat[][], int n){
+        float determinant = 0f;
         if (n == 1)
             return mat[0][0];
         float temp[][] = new float[mat.length][mat.length];
         float sign = 1f;
         for (int f = 0; f < n; f++) {
             getCofactor(mat, temp, 0, f, n);
-            D += sign * mat[0][f] * determinantOfMatrix(temp, n - 1);
+            determinant += sign * mat[0][f] * getDeterminant(temp, n - 1);
             sign = -sign;
         }
  
-        return D;
+        return determinant;
     }
     
-    public static float toBase10(float[] vec) {
-		float result = 0;
-		for (int i=0;i<vec.length;i++)
-			result += vec[i]*Math.pow(2, i);
-		return result;
+    // use the main method to test stuff in this class
+	public static void main(String[] args) {
+		float[][] A = new float[][] {
+			{1, 2, 5},
+			{3, 4, 6}
+		};
+		float[][] B = new float[][] {
+			{0, 5},
+			{6, 7},
+		};
+		System.out.println(PrintUtils.toString(getKronekerProduct(A, B)));
 	}
-    public static float toBase10(Qvec qvec) {
-		float result = 0;
-		for (int i=0;i<qvec.re.length;i++)
-			result += qvec.getProbabilityForPosition(i)*Math.pow(2, i);
-		return result;
-	}
-    
-    public static float[][] getAForFitness(float psi_g, float psi_p){
-    	double theta = Math.asin(psi_g - psi_p);
-    	float a0 = TestData.ro * (float)(Math.cos(theta) - Math.sin(theta));
-    	float a1 = TestData.ro * (float)(Math.cos(theta) + Math.sin(theta));
-    	float[][] A = new float[][] {
-    		{a0,  a1},
-    		{a1, -a0},
-    	};
-    	return A;
-    }
-
 }

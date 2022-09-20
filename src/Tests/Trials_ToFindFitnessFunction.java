@@ -4,11 +4,11 @@ import QuantumUtils.Point;
 import QuantumUtils.Qpoz;
 import QuantumUtils.Qvec;
 import QuantumUtils.Utils;
-import QuantumUtils.UtilsMatrix;
-import QuantumUtils.UtilsPrint;
+import QuantumUtils.MatrixUtils;
+import QuantumUtils.PrintUtils;
 import QuantumUtils.WalkerUtils;
 
-public class ToFindFitnessFunction {
+public class Trials_ToFindFitnessFunction {
 
 	public static void main(String[] args) {
 		float[] fitness = new float[] {0, 0, 0, 0, 0, 0, 0, 1};
@@ -54,8 +54,8 @@ public class ToFindFitnessFunction {
 		//matr1 = UtilsMatrix.multiply(matr1, 1f/8f/ UtilsMatrix.determinantOfMatrix(matr1, 8));
 		
 		Qvec[] f = Utils.getFitnessInitial(16 /*length*/, 0 /*right*/, 8/*middle*/);
-		float[][] A = UtilsMatrix.getAForFitness(psi_g, psi_p);
-		System.out.println("determinant A: " + UtilsMatrix.determinantOfMatrix(A, 2));
+		float[][] A = MatrixUtils.getAForFitness(psi_g, psi_p);
+		System.out.println("determinant A: " + MatrixUtils.getDeterminant(A));
 		for (int step=0;step<TestData.timeHorizon-1;step++) {
 			//System.out.println("step "+ step);
 			Utils.stepLinear(f, A, true);

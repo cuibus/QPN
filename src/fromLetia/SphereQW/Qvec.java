@@ -1,4 +1,4 @@
-package SphereQuantumWalker_Letia;
+package fromLetia.SphereQW;
 
 //Quantum Vector of dm dimension 
 //dm - dimension

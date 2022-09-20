@@ -3,8 +3,7 @@ package Tests;
 import QuantumUtils.Point;
 import QuantumUtils.Qpoz;
 import QuantumUtils.Utils;
-import QuantumUtils.UtilsPrint;
-import QuantumUtils.UtilsQbit;
+import QuantumUtils.PrintUtils;
 
 public class TestStep_Letia {
 	public static float ro = Utils.ro;
@@ -32,10 +31,9 @@ public class TestStep_Letia {
 	public static void main(String[] args) {
 		float theta0 = TestData.getRandomTheta();
 		float theta1 = TestData.getRandomTheta();
-		float[][] A = getA(theta0, theta1);
 		float[][] gamma = multiply(getA(theta0, theta1),  TestData.gammaForCoinFromPaper);
 		
-		System.out.println("gamma: \n" + UtilsPrint.toString(gamma));
+		System.out.println("gamma: \n" + PrintUtils.toString(gamma));
 		int orientation = 0;
 		Point startPoint = new Point(1,1);
 		Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);

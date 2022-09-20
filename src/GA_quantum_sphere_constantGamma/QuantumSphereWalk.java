@@ -12,7 +12,7 @@ import org.jgap.impl.IntegerGene;
 
 import GAUtils.PopulationInitializatorConstantGamma;
 import GAUtils.RandomUnitaryTransformOperator;
-import QuantumUtils.UtilsPrint;
+import QuantumUtils.PrintUtils;
 
 public class QuantumSphereWalk {
 	// a gamma matrix, constant in time and equal for each cell
@@ -38,7 +38,7 @@ public class QuantumSphereWalk {
 			population.evolve();
 			IChromosome bestChrSoFar = population.getFittestChromosome();
 			String chrOneLine = ff.asStringOneLine(bestChrSoFar);
-			String trajectory = UtilsPrint.toStringTrajectory(ff.Mapping1(bestChrSoFar));
+			String trajectory = PrintUtils.toStringTrajectory(ff.Mapping1(bestChrSoFar));
 			System.out.println(i+". Fitness: " + bestChrSoFar.getFitnessValue() + ", indiv: " + chrOneLine);
 			System.out.println("Trajectory: " + trajectory);
 		}

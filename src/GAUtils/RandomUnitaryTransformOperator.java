@@ -2,14 +2,12 @@ package GAUtils;
 
 import java.util.List;
 
-import javax.management.RuntimeErrorException;
-
 import org.jgap.GeneticOperator;
 import org.jgap.IChromosome;
 import org.jgap.Population;
 import org.jgap.impl.DoubleGene;
 
-import QuantumUtils.UtilsQbit;
+import QuantumUtils.QbitUtils;
 
 
 public class RandomUnitaryTransformOperator implements GeneticOperator{
@@ -30,7 +28,7 @@ public class RandomUnitaryTransformOperator implements GeneticOperator{
         	for (int t=0;t<thetas.length;t++) {
         		thetas[t] = (float)(Math.random() * 2 * Math.PI);
         	}
-        	chrv = UtilsQbit.multiplyA(chrv, thetas);
+        	chrv = QbitUtils.multiplyA(chrv, thetas);
         	for (int j=0;j<chrv.length;j++) {
         		((DoubleGene)chr.getGene(j)).setAllele(chrv[j]);
         	}

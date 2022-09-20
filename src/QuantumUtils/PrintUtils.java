@@ -5,7 +5,7 @@ import org.jgap.impl.DoubleGene;
 
 import Tests.TestData;
 
-public class UtilsPrint {
+public class PrintUtils {
 	public static String toString(float[][] matrix) {
 		StringBuilder sb = new StringBuilder();
 		for (int i=0;i<matrix.length;i++) {

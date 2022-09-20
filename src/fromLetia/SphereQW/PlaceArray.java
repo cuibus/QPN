@@ -1,4 +1,4 @@
-package SphereQuantumWalker_Letia;
+package fromLetia.SphereQW;
 //build an array of arDim of Qpoz
 public class PlaceArray {
 	int arDim=16;

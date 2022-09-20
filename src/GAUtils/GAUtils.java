@@ -7,7 +7,7 @@ import QuantumUtils.Point;
 import QuantumUtils.Qpoz;
 import Tests.TestData;
 
-public class UtilsGA {
+public class GAUtils {
 	// adds the given chromosomes (as double[]) to the population by replacing the values of the last chromosomes in that population
 	// unfortunately, creating new chromosomes is very difficult, so we just replace existing ones
 	public static void addChrToPopulation(Genotype population, double[][] chrsAsDoubleVector) {

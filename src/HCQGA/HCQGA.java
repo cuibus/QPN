@@ -12,9 +12,9 @@ import org.jgap.impl.IntegerGene;
 
 import GAUtils.PopulationInitializatorConstantGamma;
 import GAUtils.RandomUnitaryTransformOperator;
-import GAUtils.UtilsGA;
-import GAUtils.QuantumInspiredGAForFloats.FloatProgressiveTransformOperator;
-import QuantumUtils.UtilsPrint;
+import GAUtils.FloatProgressiveTransformOperator;
+import GAUtils.GAUtils;
+import QuantumUtils.PrintUtils;
 
 public class HCQGA {
 	private static double[][] bestChrsSoFar = new double[][] {
@@ -50,7 +50,7 @@ public class HCQGA {
 		conf.setSampleChromosome(sampleChromosome);
 		conf.setPopulationSize(500);
 		Genotype population = Genotype.randomInitialGenotype(conf);
-		UtilsGA.addChrToPopulation(population, bestChrsSoFar);
+		GAUtils.addChrToPopulation(population, bestChrsSoFar);
 		for (int i = 0; i < MAX_ALLOWED_EVOLUTIONS; i++) {
 			population.evolve();
 			IChromosome bestChrSoFar = population.getFittestChromosome();
@@ -61,7 +61,7 @@ public class HCQGA {
 			//System.out.println("Trajectory: " + trajectory);
 			
 			System.out.println(i+". " + ff.evaluate(bestChrSoFar) 
-			+ "\t" + UtilsPrint.toString(bestChrSoFar)
+			+ "\t" + PrintUtils.toString(bestChrSoFar)
 			+ "" + psiString);
 		}
 	}

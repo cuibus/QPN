@@ -1,24 +1,14 @@
 package HCQGA;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
-
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
-import org.jgap.impl.IntegerGene;
 
-import GAUtils.UtilsGA;
 import QuantumUtils.Point;
-import QuantumUtils.Qbit;
 import QuantumUtils.Qpoz;
 import QuantumUtils.Qvec;
 import QuantumUtils.Utils;
-import QuantumUtils.UtilsMatrix;
-import QuantumUtils.UtilsPrint;
+import QuantumUtils.MatrixUtils;
 import QuantumUtils.WalkerUtils;
 import Tests.TestData;
 
@@ -44,13 +34,13 @@ public class SphereWalkEvaluator extends FitnessFunction {
 				
 				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
 				for (int step=0;step<TestData.timeHorizon-1;step++) {
-					gamma = UtilsMatrix.multiply(U, gamma);
+					gamma = MatrixUtils.multiply(U, gamma);
 					Utils.step(p, gamma, false);
 					
 					/*float theta = (float)WalkerUtils.psi_g(p) - WalkerUtils.psi_p(p) - 0.05f*WalkerUtils.psi_n(p);
 					angle_cumulat += step*0.5* theta;
 					*/
-					float[][] A = UtilsMatrix.getAForFitness(WalkerUtils.psi_g(p), WalkerUtils.psi_p(p));
+					float[][] A = MatrixUtils.getAForFitness(WalkerUtils.psi_g(p), WalkerUtils.psi_p(p));
 					Utils.stepLinear(f, A, false);
 					
 					/*if (WalkerUtils.psi_p(p) > 0.7)
@@ -118,7 +108,7 @@ public class SphereWalkEvaluator extends FitnessFunction {
 			for (int orientation: TestData.startOrientations){
 				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
 				for (int step=0;step<TestData.timeHorizon;step++) {
-					gamma = UtilsMatrix.multiply(U, gamma);
+					gamma = MatrixUtils.multiply(U, gamma);
 					Utils.step(p, gamma, false);
 
 					float psi_p = WalkerUtils.psi_p(p);
@@ -150,20 +140,20 @@ public class SphereWalkEvaluator extends FitnessFunction {
 		// returneaza gamma, cromozomul are 2 nr float [0, 2*pi]
 		float teta0 = (float)((DoubleGene)chr.getGene(0)).doubleValue();
 		float teta1 = (float)((DoubleGene)chr.getGene(1)).doubleValue();
-		float[][] A = UtilsMatrix.getA(teta0, teta1);
+		float[][] A = MatrixUtils.getA(teta0, teta1);
 		float[][] coin = TestData.gammaForCoinFromPaper;
 
-		return UtilsMatrix.multiply(A, coin);
+		return MatrixUtils.multiply(A, coin);
 	}
 	
 	public float[][] MappingU(IChromosome chr){
 		// returneaza gamma, cromozomul are 2 nr float [0, 2*pi]
 		float teta2 = (float)((DoubleGene)chr.getGene(2)).doubleValue();
 		float teta3 = (float)((DoubleGene)chr.getGene(3)).doubleValue();
-		float[][] A = UtilsMatrix.getA(teta2, teta3);
+		float[][] A = MatrixUtils.getA(teta2, teta3);
 		float[][] coin = TestData.gammaForCoinFromPaper;
 
-		return UtilsMatrix.multiply(A, coin);
+		return MatrixUtils.multiply(A, coin);
 	}
 	
 	

@@ -1,4 +1,4 @@
-package GAUtils.QuantumInspiredGAForFloats;
+package GAUtils;
 
 import java.util.List;
 import org.jgap.GeneticOperator;
