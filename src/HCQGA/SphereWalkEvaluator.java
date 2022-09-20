@@ -1,8 +1,10 @@
-package GA_quantum_sphere_variableGamma_theta;
+package HCQGA;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
@@ -11,7 +13,9 @@ import org.jgap.impl.IntegerGene;
 
 import GAUtils.UtilsGA;
 import QuantumUtils.Point;
+import QuantumUtils.Qbit;
 import QuantumUtils.Qpoz;
+import QuantumUtils.Qvec;
 import QuantumUtils.Utils;
 import QuantumUtils.UtilsMatrix;
 import QuantumUtils.UtilsPrint;
@@ -19,48 +23,88 @@ import QuantumUtils.WalkerUtils;
 import Tests.TestData;
 
 public class SphereWalkEvaluator extends FitnessFunction {
-	private final double POSITIVE_BIAS = 20;
+	private final double POSITIVE_BIAS = 10;
+	
 	private final float thresholdProbabilityTarget = 0.7f;
-	private final float thresholdProbabilityTrap = 0.3f;
 
 	public double evaluate(IChromosome chr) {
 		float[][] gamma = MappingGamma0(chr); // this is gamma0 at this point
 		float[][] U = MappingU(chr);
 
-		double fitness = 0;
+		//Qvec[] f = Utils.getFitnessInitial(32 /*length*/, 0 /*right*/, 15/*middle*/);
+		float fitness_overall = 0;
 		for (Point startPoint: TestData.startPoints)
 			for (int orientation: TestData.startOrientations){
+				//Qbit[] fitness = new Qbit[10];
+				//for (int i=0;i<10;i++) fitness[i] = Qbit.Ket0();
+				//int currentFitnessIndex = 4;
+				//float angle_cumulat = 50;
+				//Qbit fitness = Qbit.Ket0();
+				Qvec[] f = Utils.getFitnessInitial(32/*length*/, 1/*orientation*/, 16/*middle*/);
+				
 				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
-				for (int step=0;step<TestData.timeHorizon;step++) {
+				for (int step=0;step<TestData.timeHorizon-1;step++) {
 					gamma = UtilsMatrix.multiply(U, gamma);
 					Utils.step(p, gamma, false);
 					
-					double trapProbability = WalkerUtils.getProbForPositionsTotal(p, TestData.trapPoints);
-					fitness -= trapProbability > thresholdProbabilityTrap ? 20 : 0;
-					double targetProbability = WalkerUtils.getProbForPositionsTotal(p, TestData.targetPoints);
-					double bonification = targetProbability > thresholdProbabilityTarget ? 20 : 0;
-					fitness += bonification + targetProbability;
+					/*float theta = (float)WalkerUtils.psi_g(p) - WalkerUtils.psi_p(p) - 0.05f*WalkerUtils.psi_n(p);
+					angle_cumulat += step*0.5* theta;
+					*/
+					float[][] A = UtilsMatrix.getAForFitness(WalkerUtils.psi_g(p), WalkerUtils.psi_p(p));
+					Utils.stepLinear(f, A, false);
 					
-					if (bonification >= 20) {
-						break; // stop simulation
+					/*if (WalkerUtils.psi_p(p) > 0.7)
+						fitness = UtilsMatrix.multiply(TestData.shiftLeft8, fitness);
+					if (WalkerUtils.psi_g(p) > 0.7)
+						fitness = UtilsMatrix.multiply(TestData.shiftRight8, fitness);
+						*/
+					/*float[][] matr = UtilsMatrix.add(
+							UtilsMatrix.multiply(TestData.shiftRight8,
+									//3*WalkerUtils.psi_g(p) + 0.55f*WalkerUtils.psi_n(p)),
+									(float)(WalkerUtils.psi_g(p) - WalkerUtils.psi_p(p) - 0.1*WalkerUtils.psi_n(p))),
+							//UtilsMatrix.multiply(TestData.IdentityMatrix(8), WalkerUtils.psi_n(p)),
+							UtilsMatrix.multiply(TestData.IdentityMatrix(8),
+									//WalkerUtils.psi_p(p) + 0.45f*WalkerUtils.psi_n(p))
+									//1-WalkerUtils.psi_g(p))
+									0)
+							);
+			*/
+					//float[][] shL = UtilsMatrix.multiply(TestData.shiftRight8, WalkerUtils.psi_g(p))
+				   // fitness = UtilsMatrix.multiply(matr, fitness);
+					
+					//fitness_overall += WalkerUtils.psi_g(p) - WalkerUtils.psi_p(p) - 0.1f*WalkerUtils.psi_n(p); 
+					//float theta = (float)Math.atan(WalkerUtils.psi_g(p) - WalkerUtils.psi_p(p) - 0.1f*WalkerUtils.psi_n(p));
+					//fitness = fitness.rotate(UtilsMatrix.getA(theta));
+					/*
+					float theta0 = (float)Math.atan(WalkerUtils.psi_g(p) / ( 1.0d * WalkerUtils.psi_n(p))); // k1 = coefficient for fulfilling target conditions
+					float theta1 = (float)Math.atan(WalkerUtils.psi_p(p) / ( 1.0d * WalkerUtils.psi_n(p))); // k2 = coefficient for fulfilling trap conditions
+					fitness = UtilsMatrix.shift(
+							UtilsMatrix.multiply(
+								UtilsMatrix.multiply(
+										TestData.gammaForCoinFromPaper,
+										UtilsMatrix.getA(theta0, theta1)
+								),
+								fitness
+							));
+							*/
+					//System.out.println(UtilsPrint.toString(fitness));
+					//try {System.in.read();}catch (IOException e) {};
+					//fitness_overall = fitness.re[1];
+					if (WalkerUtils.psi_g(p) > thresholdProbabilityTarget) {
+						
+						break;
 					}
-					fitness -= 1; // penalize each step	
+					fitness_overall += f[0].getTotalProbability() - f[1].getTotalProbability();
+
 				}
+				//fitness_overall += UtilsMatrix.toBase10(f[0]);
+				//fitness_overall += UtilsMatrix.sum(fitness);
+				//fitness_overall += UtilsMatrix.toBase10(fitness);
+				//fitness_overall += Math.max(0, (int)(angle_cumulat / (Math.PI / 2)));
+				//fitness_overall += WalkerUtils.getTotalFitness(f);
 			}
 		//System.out.println(fitness + POSITIVE_BIAS);
-		return fitness + POSITIVE_BIAS;
-	}
-	private static String getMaxProbString(float[][] prob) {
-		int imax=0,jmax = 0;
-		float probmax = prob[0][0];
-		for (int i=0;i<8;i++)
-			for (int j=0;j<8;j++)
-				if (prob[i][j] > probmax) {
-					probmax = prob[i][j];
-					imax = i;
-					jmax = j;
-				}
-		return "maxProbability: "+probmax+" at position: ("+imax+","+jmax+")";
+		return fitness_overall + POSITIVE_BIAS;
 	}
 	
 	public String getPsiString(IChromosome chr) {
@@ -101,16 +145,7 @@ public class SphereWalkEvaluator extends FitnessFunction {
 		return String.format("%.6f\t%.6f",psi_g_max,psi_p_max);
 	}
 	
-	/*private double getPointsProbability(Qpoz[] p, List<Point> points) {
-		float probability = 0;
-		for (Point point: points) {
-			for (int orient=0;orient<4;orient++)
-				probability += p[orient].getProbabilityForPosition(point.x, point.y);
-		} 	
-		return probability;
-	}
-	*/
-
+	
 	public float[][] MappingGamma0(IChromosome chr){
 		// returneaza gamma, cromozomul are 2 nr float [0, 2*pi]
 		float teta0 = (float)((DoubleGene)chr.getGene(0)).doubleValue();
@@ -118,9 +153,7 @@ public class SphereWalkEvaluator extends FitnessFunction {
 		float[][] A = UtilsMatrix.getA(teta0, teta1);
 		float[][] coin = TestData.gammaForCoinFromPaper;
 
-		float[][] result = UtilsMatrix.multiply(A, coin);
-		//System.out.println("A\n"+UtilsPrint.toStringOneLine(result));
-		return result;
+		return UtilsMatrix.multiply(A, coin);
 	}
 	
 	public float[][] MappingU(IChromosome chr){
@@ -130,10 +163,9 @@ public class SphereWalkEvaluator extends FitnessFunction {
 		float[][] A = UtilsMatrix.getA(teta2, teta3);
 		float[][] coin = TestData.gammaForCoinFromPaper;
 
-		float[][] result = UtilsMatrix.multiply(A, coin);
-		//System.out.println("U\n"+UtilsPrint.toStringOneLine(result));
-		return result;
+		return UtilsMatrix.multiply(A, coin);
 	}
+	
 	
 	public String asStringOneLine(IChromosome chr) {
 		StringBuilder sb = new StringBuilder("");
@@ -146,58 +178,12 @@ public class SphereWalkEvaluator extends FitnessFunction {
 			sb.append("|");
 		}
 		
-		sb.append("U: ");
+		sb.append(" U: ");
 		for (int i=0;i<4;i++) {
 			for (int j=0;j<4;j++)
 				sb.append(U[i][j] + " ");
 			sb.append("|");
 		}
 		return sb.toString();
-	}
-	
-	public double getTargetMaxProbability(IChromosome chr) {
-		return getMaxProbabilityFromSimulation(chr, TestData.targetPoints);
-	}
-	
-	public double getTrapMaxProbability(IChromosome chr) {
-		return getMaxProbabilityFromSimulation(chr, TestData.trapPoints);
-	}
-	private double getMaxProbabilityFromSimulation(IChromosome chr, List<Point> points) {
-		float[][] gamma = MappingGamma0(chr); // this is gamma0 at this point
-		float[][] U = MappingU(chr);
-		
-		double maxProbability = 0;
-		for (Point startPoint: TestData.startPoints)
-			for (int orientation: TestData.startOrientations){
-				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
-				for (int step=0;step<TestData.timeHorizon;step++) {
-					gamma = UtilsMatrix.multiply(U, gamma);
-					Utils.step(p, gamma, false);
-					double prob = WalkerUtils.getProbForPositionsTotal(p, points);
-					maxProbability = Math.max(maxProbability, prob);
-				}
-			}
-		return maxProbability;
-	}
-	
-	public int getStepMaxProb(IChromosome chr) {
-		float[][] gamma = MappingGamma0(chr); // this is gamma0 at this point
-		float[][] U = MappingU(chr);
-		
-		double maxProbability = 0;
-		int stp = 0;
-		for (Point startPoint: TestData.startPoints)
-			for (int orientation: TestData.startOrientations){
-				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
-				for (int step=0;step<TestData.timeHorizon;step++) {
-					gamma = UtilsMatrix.multiply(U, gamma);
-					Utils.step(p, gamma, false);
-					double targetProbability = WalkerUtils.getProbForPositionsTotal(p, TestData.targetPoints);
-					if (maxProbability < targetProbability)
-						stp = step;
-					maxProbability = Math.max(maxProbability, targetProbability);
-				}
-			}
-		return stp;
 	}
 }

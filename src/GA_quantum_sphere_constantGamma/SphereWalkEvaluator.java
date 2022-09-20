@@ -23,7 +23,7 @@ public class SphereWalkEvaluator extends FitnessFunction {
 
 	public double evaluate(IChromosome chr) {
 		float[][] constantGamma = Mapping1(chr);
-		Utils.printChr(chr);
+		UtilsPrint.printChr(chr);
 		System.out.println("constantGamma: \n " + UtilsPrint.toString(constantGamma));
 		double fitness = 0;
 		for (Point startPoint: TestData.startPoints)

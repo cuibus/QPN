@@ -26,7 +26,7 @@ public class TestStep {
 		float[] twoQbitsRe = new float[] {twoQbits[0], twoQbits[2], twoQbits[4], twoQbits[6]};
 		float[] twoQbitsIm = new float[] {twoQbits[1], twoQbits[3], twoQbits[5], twoQbits[7]};
 		float[][] gamma = TestData.gammaForCoinFromPaper; // Utils.getGamma(twoQbitsRe, twoQbitsIm, 0); // 
-		Utils.printQbits(twoQbits);
+		UtilsPrint.printQbits(twoQbits);
 		System.out.println("Gamma: \n"+ UtilsPrint.toString(gamma));
 		int orientation = 0;
 		Point startPoint = new Point(1,1);

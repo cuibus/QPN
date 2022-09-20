@@ -7,10 +7,15 @@ import QuantumUtils.Qpoz;
 import QuantumUtils.Utils;
 import QuantumUtils.UtilsMatrix;
 import QuantumUtils.UtilsPrint;
+import QuantumUtils.WalkerUtils;
 
 public class TestStep_final {
 	private static double[] bestChr = new double[]
-			{1.5956064231199028, 1.5477396647067376, 1.5631732184629108, 0.02732166016872828}; // 0.98 step 11
+			//{1.5956064231199028, 1.5477396647067376, 1.5631732184629108, 0.02732166016872828}; // 0.98 step 11
+			//{1.506280319,	1.515821243,	6.277452228,	1.575274492};
+			//{1.533609729,	1.545308049,	4.715572125,	6.279499461};
+			{6.231307762,	1.515612706,	0.855429173,	2.266428197};
+	
 	// fiecare coeficient = arctg(beta/alfa), unde beta^2+alfa^2 = 1;
 	// => tan(coef) = beta/alfa => b = tan(coef)*a =>
 	// tan^2*a^2 + a^2 = 1 => a = sqrt(1/(1+tan^2))
@@ -34,34 +39,44 @@ public class TestStep_final {
 		System.out.println("initial qbits:");
 		System.out.println(getQbitsFromTetas(bestChr));
 		System.out.println("GAMMA0 = A(teta1,teta2) * coin_matrix : \n"+UtilsPrint.toString(gamma));
+		
 		float teta2 = (float)bestChr[2];
 		float teta3 = (float)bestChr[3];
 		A = UtilsMatrix.getA(teta2, teta3);
 		float[][] U = UtilsMatrix.multiply(A, coin);
 		System.out.println("U = A(teta3,teta4) * coin_matrix : \n"+UtilsPrint.toString(U));
 		
-		for (Point startPoint: TestData.startPoints)
-			for (int orientation: TestData.startOrientations){
-				Qpoz[] p = Utils.getQpozInitial(orientation, startPoint.x, startPoint.y);
-				for (int step=0;step<TestData.timeHorizon;step++) {
-					gamma = UtilsMatrix.multiply(U, gamma);
-					System.out.println("\nstep "+ step);
-					Utils.step(p, gamma, true);
-					double targetProbability = getPointsProbability(p, TestData.targetPoints);
-					double trapProbability = getPointsProbability(p, TestData.trapPoints);
-					System.out.println(
-							"target prob: " + String.format("%.4f", targetProbability) + ", " +
-							"trap prob: " + String.format("%.4f", trapProbability));
-				}
-			}
+		Point startPoint = TestData.startPoints.get(0);
+		int startOrientation = TestData.startOrientations[0];
+		Qpoz[] p = Utils.getQpozInitial(startOrientation, startPoint.x, startPoint.y);
+		
+		//System.out.println("psi step000: " + UtilsPrint.getPsiFormatted(p));
+		//System.out.println(UtilsPrint.toString(WalkerUtils.getProbForAllPositions(p)));
+		
+		for (int step=0;step<TestData.timeHorizon;step++) {
+			gamma = UtilsMatrix.multiply(U, gamma);
+			//System.out.println("\nstep "+ step);
+			Utils.step(p, gamma, false);
+			//System.out.println("psi (neutral,target,trap, &), step "+step+": " + UtilsPrint.getPsiFormatted(p));
+			//System.out.println(UtilsPrint.toString(WalkerUtils.getProbForAllPositions(p)));
+			float[][] prob = WalkerUtils.getProbForAllPositions(p);
+			System.out.println("step "+step+", " + getMaxProbString(prob) + 
+					", all probabilities:\n" + UtilsPrint.toString(prob));
+			
+		}
 	}
 	
-	private static double getPointsProbability(Qpoz[] p, List<Point> points) {
-		float probability = 0;
-		for (Point targetPoint: points) {
-			for (int orient=0;orient<3;orient++)
-				probability += p[orient].getProbabilityForPosition(targetPoint.x, targetPoint.y);
-		}
-		return probability;
+	private static String getMaxProbString(float[][] prob) {
+		int imax=0,jmax = 0;
+		float probmax = prob[0][0];
+		for (int i=0;i<prob.length;i++)
+			for (int j=0;j<prob[0].length;j++)
+				if (prob[i][j] > probmax) {
+					probmax = prob[i][j];
+					imax = i;
+					jmax = j;
+				}
+		return String.format("maxProbability: %.4f at pos (%d,%d)", probmax, imax, jmax);
 	}
+
 }

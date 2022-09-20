@@ -1,8 +1,5 @@
 package QuantumUtils;
 
-import java.util.HashMap;
-
-import org.jgap.IChromosome;
 
 public class Utils {
 	public static float ro= (float) (1/Math.sqrt(2.0));
@@ -89,7 +86,7 @@ public class Utils {
 		//t0-t3
 		for (int i=0;i<4;i++)
 			for (int j=0;j<4;j++) {
-				p_aux[i][j].copy(p[i]);
+				p_aux[i][j].copyFrom(p[i]);
 				p_aux[i][j].multiply(gamma[i][j], gamma[i][j]);	
 			}
 
@@ -124,6 +121,38 @@ public class Utils {
 			throw new RuntimeException("probability error, probX="+probX+";probY="+probY);
 	}
 	
+	public static void stepLinear(Qvec[] fi, float[][] A, boolean printOutVerbose) {
+		// fi are 2 componente: fi_stanga, fi_dreapta - una pt fiecare orientare; fiecare Qvec are dimensiune 16
+		Qvec fi_aux_dr0 = fi[0].createCopy();
+		Qvec fi_aux_st0 = fi[1].createCopy();
+		fi_aux_dr0.multiply(A[0][0], A[0][0]);
+		fi_aux_st0.multiply(A[0][1], A[0][1]);
+		
+		Qvec fi_aux_dr1 = fi[0].createCopy();
+		Qvec fi_aux_st1 = fi[1].createCopy();
+		fi_aux_dr1.multiply(A[1][0], A[1][0]);
+		fi_aux_st1.multiply(A[1][1], A[1][1]);
+		
+		fi[0].addQvec(fi_aux_dr0, fi_aux_st0);
+		fi[0].shiftPositive();
+		
+		fi[1].addQvec(fi_aux_dr1, fi_aux_st1);
+		fi[1].shiftNegative();
+
+		if (printOutVerbose) {
+			for (int i=0;i<2;i++)
+				System.out.println("fi["+i+"]: " + fi[i].toString());
+		}
+		
+		//prob test: checking total probability, should be close to 1
+		float prob=0f;
+		for (int i=0;i<2;i++) {
+			prob += fi[i].getTotalProbability();
+		}
+		if (Math.abs(prob-1) > 0.01)
+			throw new RuntimeException("probability error, prob="+prob);
+	}
+	
 	public static Qpoz[] getQpozInitial(int orientation, int x, int y) {
 		Qpoz[] qpoz = new Qpoz[4];
 		for (int i=0;i<4;i++)
@@ -135,19 +164,12 @@ public class Utils {
 		return qpoz;
 	}
 	
-	public static void printQbits(float[] qbits) {
-		System.out.println("qbits:");
-		for (int i=0;i<qbits.length;i=i+4) {
-			System.out.print("("+qbits[i]+"+i*"+qbits[i+1]+")*|0> + ("+qbits[i+2]+"+i*"+qbits[i+3]+")*|1> ; ");
-		}
-		System.out.println();
-	}
-	
-	public static void printChr(IChromosome chr) {
-		System.out.println("chr:");
-		for (int i=0;i<chr.getGenes().length;i++) {
-			System.out.print(chr.getGene(i).getAllele() + " ");
-		}
-		System.out.println();
+	public static Qvec[] getFitnessInitial(int length, int orientation, int pos) {
+		Qvec[] qvec = new Qvec[2];
+		for (int i=0;i<2;i++)
+			qvec[i] = new Qvec(length);
+		qvec[orientation].re[pos] = ro;
+		qvec[orientation].im[pos] = ro;
+		return qvec;
 	}
 }

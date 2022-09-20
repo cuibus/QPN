@@ -1,29 +1,41 @@
 package Tests;
 
 import QuantumUtils.Qbit;
+import QuantumUtils.UtilsMatrix;
+import QuantumUtils.UtilsPrint;
 import QuantumUtils.UtilsQbit;
 
-public class TestMultiplyA {
-	public static String toStr(float[] vector) {
-		String s = "";
-		for (int i=0;i<vector.length;i++)
-			s += vector[i] + " ";
-		return s;
-	}
+public class TestMultiplyA_Qbit {
 	
 	public static void multiplyAOneQbit() {
 		float[] oneQbit = TestData.oneQbitRo;
 		
 		for (int step = 0; step<100;step++) {
-			System.out.println(step + ". Before multiply: " + toStr(oneQbit));
+			System.out.println(step + ". Before multiply: " + UtilsPrint.toString(oneQbit));
 			checkHilbertOneQbit(oneQbit, 0.01f);
 			
-			float theta = 4.889314f; //TestData.getRandomTheta();
+			float theta = 0.01f; //TestData.getRandomTheta();
 			System.out.println(step + ". Theta: "+ theta);
 			oneQbit = UtilsQbit.multiplyA(oneQbit, new float[] { theta });
 			
-			System.out.println(step + ". After multiply: " + toStr(oneQbit));
+			System.out.println(step + ". After multiply: " + UtilsPrint.toString(oneQbit));
 			checkHilbertOneQbit(oneQbit, 0.01f);
+		}
+	}
+	
+	public static void rotateOneQbit() {
+		Qbit qbit = Qbit.Ket0();
+		
+		for (int step = 0; step<200;step++) {
+			System.out.println(step + ". Before multiply: " + qbit.toString());
+			qbit.checkHilbert(1f);
+			
+			float theta = 0.1f; //TestData.getRandomTheta();
+			System.out.println(step + ".Rotate"+ qbit.getAngle() +"with theta: "+ theta);
+			qbit = qbit.rotate(UtilsMatrix.getA(theta));
+			
+			System.out.println(step + ". After multiply: " + qbit.toString());
+			qbit.checkHilbert(1f);
 		}
 	}
 	
@@ -31,7 +43,7 @@ public class TestMultiplyA {
 		//float[] twoQbits = TestData.twoQbitsRo0;
 		float[] twoQbits = TestData.twoQbitsHalf;
 		for (int step = 0; step<100;step++) {
-			System.out.println(step + ". Before multiply: " + toStr(twoQbits));
+			System.out.println(step + ". Before multiply: " + UtilsPrint.toString(twoQbits));
 			checkHilbertTwoQbits(twoQbits, 0.01f);
 			
 			float theta1 = TestData.getRandomTheta();
@@ -39,13 +51,14 @@ public class TestMultiplyA {
 			System.out.println(step + ". Theta1: "+ theta1 + ", theta2: "+ theta2);
 			twoQbits = UtilsQbit.multiplyA(twoQbits, new float[] { theta1, theta2 });
 			
-			System.out.println(step + ". After multiply: " + toStr(twoQbits));
+			System.out.println(step + ". After multiply: " + UtilsPrint.toString(twoQbits));
 			checkHilbertTwoQbits(twoQbits, 0.01f);
 		}
 	}
 	public static void main(String[] args) {
 		//multiplyAOneQbit();
-		multiplyATwoQbits();
+		//multiplyATwoQbits();
+		rotateOneQbit();
 	}
 	
 	public static void checkHilbertOneQbit(float[] oneqbit, float tolerance) {
